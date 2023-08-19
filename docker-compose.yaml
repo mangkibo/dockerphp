@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  php8ap:
+    build:
+      context: "./php82"
+      dockerfile: Dockerfile.php8apache-deb
+    container_name: php82ap_cntr
+    image: php82ap_img
+    volumes:
+      - ./apptest/html:/var/www/html/app:delegated
+    ports: 
+      - 8123:80
+    networks:
+      - localnetwork
+networks:
+  localnetwork:
+    driver: bridge

@@ -1,0 +1,1 @@
+docker build -t php8.2cli-base:latest -f Dockerfile.php8cli-alp .

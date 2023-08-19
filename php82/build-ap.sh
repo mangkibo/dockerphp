@@ -1,0 +1,1 @@
+docker build -t php8.2apache-base:latest -f Dockerfile.php8apache-deb .
