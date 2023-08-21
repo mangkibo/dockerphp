@@ -1,0 +1,1 @@
+docker build -t php7.4apache-base:latest -f Dockerfile.php7apache-deb .

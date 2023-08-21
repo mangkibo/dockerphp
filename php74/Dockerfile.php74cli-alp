@@ -1,0 +1,79 @@
+#FROM php:7.4-cli-alpine
+FROM php:7.4.9-cli-alpine3.12
+
+
+# Install dependencies
+# RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
+
+RUN apk update 
+RUN apk add --no-cache bash
+RUN apk add --no-cache build-base sudo shadow curl libc6-compat autoconf make g++ gnupg
+  
+RUN apk add --no-cache php7  
+RUN apk add --no-cache  php7-dev \
+  php7-fpm \
+  php7-common \
+  php7-pdo  \
+  php7-mcrypt \
+  php7-mbstring \
+  php7-xml \
+  php7-json \
+  php7-phar \
+  php7-zip \
+  php7-openssl \
+  php7-pear \
+  php7-gd \
+  php7-dom \
+  php7-session \
+  php7-zlib \
+  zip libzip-dev
+
+# Create User Without Root
+RUN addgroup -S mahameru && adduser -S mahameru -G mahameru \
+  && echo "mahameru ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/mahameru \
+  && chmod 0440 /etc/sudoers.d/mahameru
+
+# Add and Enable PHP-PDO Extenstions
+RUN docker-php-ext-install zip exif
+
+RUN apk add --no-cache freetype libpng libjpeg-turbo 
+RUN apk add --no-cache freetype-dev libpng-dev libjpeg-turbo-dev 
+
+RUN  docker-php-ext-configure gd \
+    --with-freetype=/usr/include/ \
+    --with-jpeg=/usr/include/ && \
+  NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
+  docker-php-ext-install -j${NPROC} gd && \
+  apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
+
+COPY cfg/php.ini /usr/local/etc/php/php.ini   
+
+# Install MS ODBC Connector
+#Download the desired package(s)
+RUN curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.8.1.1-1_amd64.apk
+RUN curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.8.1.1-1_amd64.apk
+
+#(Optional) Verify signature,
+RUN curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.8.1.1-1_amd64.sig
+RUN curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.8.1.1-1_amd64.sig
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc  | gpg --import -
+RUN gpg --verify msodbcsql17_17.8.1.1-1_amd64.sig msodbcsql17_17.8.1.1-1_amd64.apk
+RUN gpg --verify mssql-tools_17.8.1.1-1_amd64.sig mssql-tools_17.8.1.1-1_amd64.apk
+
+#Install the package(s)
+RUN apk add --allow-untrusted msodbcsql17_17.8.1.1-1_amd64.apk
+RUN apk add --allow-untrusted mssql-tools_17.8.1.1-1_amd64.apk
+
+#PHP SQL SRV Extension
+RUN apk add unixodbc-dev 
+RUN pecl install sqlsrv 
+RUN pecl install pdo_sqlsrv 
+RUN echo extension=pdo_sqlsrv.so >> `php --ini | grep "Scan for additional .ini files" | sed -e "s|.*:\s*||"`/10_pdo_sqlsrv.ini
+RUN echo extension=sqlsrv.so >> `php --ini | grep "Scan for additional .ini files" | sed -e "s|.*:\s*||"`/00_sqlsrv.ini
+
+#COMPOSER
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Select User
+USER mahameru
