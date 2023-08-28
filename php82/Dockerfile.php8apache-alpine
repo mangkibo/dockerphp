@@ -2,7 +2,7 @@ FROM php:8.2-fpm-alpine
 
 # install devel library
 RUN apk update && apk add --no-cache sudo zip libzip-dev \
-    nginx supervisor libxml2-dev icu-dev curl \
+    apache2 libxml2-dev icu-dev curl \
     $PHPIZE_DEPS openssl-dev
 
 RUN apk add oniguruma-dev
@@ -31,17 +31,7 @@ RUN pecl install sqlsrv pdo_sqlsrv mongodb
 RUN docker-php-ext-enable sqlsrv pdo_sqlsrv mongodb
 
 #COPY cfg/php.ini /usr/local/etc/php/php.ini 
+EXPOSE 80
 
 #COMPOSER
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# setup supervisor
-COPY cfg/supervisord.conf /etc/supervisord.conf
-
-# Select User
-# USER mahameru
-
-PORT 80
-
-# run supervisord
-CMD ["/usr/bin/supervisord"]

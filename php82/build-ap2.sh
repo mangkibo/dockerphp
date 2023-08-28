@@ -1,0 +1,1 @@
+docker build -t php8.2httpd:latest -f Dockerfile.php8apache-alpine .
