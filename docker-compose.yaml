@@ -1,5 +1,17 @@
 version: "3.9"
 services:
+  php7ap:
+    build:
+      context: "./php74"
+      dockerfile: Dockerfile.php74apache-deb
+    container_name: php74ap_cntr
+    image: php74ap_img
+    volumes:
+      - ./apptest/html:/var/www/html/app/public:delegated
+    ports: 
+      - 8181:80
+    networks:
+      - localnetwork
   php8ap:
     build:
       context: "./php82"
@@ -7,9 +19,21 @@ services:
     container_name: php82ap_cntr
     image: php82ap_img
     volumes:
-      - ./apptest/html:/var/www/html/app:delegated
+      - ./apptest/html:/var/www/html/app/public:delegated
     ports: 
       - 8123:80
+    networks:
+      - localnetwork
+  php8ng:
+    build:
+      context: "./php82"
+      dockerfile: Dockerfile.php8nginx-alp
+    container_name: php82ng_cntr
+    image: php82ng_img
+    volumes:
+      - ./apptest/html:/var/www/html/app/public:delegated
+    ports: 
+      - 8234:80
     networks:
       - localnetwork
 networks:

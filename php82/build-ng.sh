@@ -1,1 +1,1 @@
-docker build -t php8.2nginx-base:latest -f Dockerfile.php8nginx-alpine .
+docker build -t php8.2nginx-base:latest -f Dockerfile.php8nginx-alp .
