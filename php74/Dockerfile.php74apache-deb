@@ -57,7 +57,7 @@ RUN docker-php-source extract \
     && docker-php-source delete
 
 # setting up projects
-RUN echo "<?php phpinfo(); ?>" /var/www/html/api/index.php
+RUN echo "<?php phpinfo(); ?>" >> /var/www/html/api/index.php
 
 # ============ copy default configuration of apache =================
 COPY cfg/default.conf /etc/apache2/sites-available/000-default.conf
