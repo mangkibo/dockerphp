@@ -48,8 +48,11 @@ RUN apt-get update \
         unixodbc unixodbc-dev \
         msodbcsql17
 
-RUN pecl install sqlsrv pdo_sqlsrv mongodb \
-    && docker-php-ext-enable sqlsrv pdo_sqlsrv mongodb
+RUN pecl install sqlsrv pdo_sqlsrv mongodb
+#RUN docker-php-ext-enable sqlsrv pdo_sqlsrv mongodb
+RUN echo "extension=pdo_sqlsrv.so" >> `php --ini | grep "Scan for additional .ini files" | sed -e "s|.*:\s*||"`/10_pdo_sqlsrv.ini
+RUN echo "extension=sqlsrv.so" >> `php --ini | grep "Scan for additional .ini files" | sed -e "s|.*:\s*||"`/00_sqlsrv.ini
+RUN docker-php-ext-enable mongodb
 # install sql server lib end
 
 RUN docker-php-source extract \
@@ -57,7 +60,10 @@ RUN docker-php-source extract \
     && docker-php-source delete
 
 # setting up projects
-RUN echo "<?php phpinfo(); ?>" >> /var/www/html/api/index.php
+RUN mkdir /var/www/html/app
+WORKDIR /var/www/html/app
+RUN mkdir public
+RUN echo "<?php phpinfo(); ?>" >> /var/www/html/app/public/index.php
 
 # ============ copy default configuration of apache =================
 COPY cfg/default.conf /etc/apache2/sites-available/000-default.conf
