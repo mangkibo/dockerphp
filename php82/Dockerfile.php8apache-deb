@@ -5,6 +5,9 @@ ENV TZ=Asia/Jakarta
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone 
 RUN date
 
+# set bash shell
+SHELL ["/bin/bash", "-c"] 
+
 # setup environment
 ENV ACCEPT_EULA=Y
 
@@ -15,7 +18,14 @@ RUN apt-get update  && \
     apt-get install libxml2-dev -y 
 
 # install odbc dev library
-RUN apt-get install unixodbc-dev -y
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc
+RUN curl https://packages.microsoft.com/config/debian/11/prod.list | tee /etc/apt/sources.list.d/mssql-release.list
+RUN apt-get update
+RUN apt-get install msodbcsql18 -y
+RUN apt-get install mssql-tools18 -y
+RUN echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
+RUN source ~/.bashrc
+RUN apt-get install unixodbc-dev libgssapi-krb5-2 -y
 
 #install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -52,7 +62,7 @@ COPY cfg/default.conf /etc/apache2/sites-available/000-default.conf
 RUN a2enmod rewrite && a2enmod headers
 
 # remove bash
-RUN apt-get autoremove --purge bash -y --allow-remove-essential
+# RUN apt-get autoremove --purge bash -y --allow-remove-essential
 
 # clean up junk
 RUN apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*

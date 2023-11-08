@@ -28,6 +28,10 @@ RUN docker-php-source extract \
     && docker-php-ext-install pdo pdo_mysql mysqli mbstring xml zip intl soap bcmath exif \
     && docker-php-source delete
 
+# install odbc library
+COPY cfg/alp-odbc.sh ./odbc.sh
+RUN sh odbc.sh
+
 # install sqlserver and mongodb
 RUN apk add unixodbc-dev 
 RUN pecl install sqlsrv pdo_sqlsrv mongodb
