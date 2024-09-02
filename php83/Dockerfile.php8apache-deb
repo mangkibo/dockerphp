@@ -1,4 +1,4 @@
-FROM php:8.3.11RC2-apache-bookworm
+FROM php:8.3-apache
 
 # set default timezone
 ENV TZ=Asia/Jakarta
@@ -49,6 +49,9 @@ RUN docker-php-source extract \
 # install sqlserver + mongodb via pecl and enable extension
 RUN pecl install sqlsrv pdo_sqlsrv mongodb
 RUN docker-php-ext-enable sqlsrv pdo_sqlsrv mongodb
+
+# copy custom php.ini
+COPY cfg/cacert-2024-07-02.pem /user/local/lib/cacert-2024-07-02.pem
 
 # setting up projects folder and testing php.ini
 RUN mkdir /var/www/html/app
