@@ -50,11 +50,12 @@ RUN docker-php-source extract \
 RUN pecl install sqlsrv pdo_sqlsrv mongodb
 RUN docker-php-ext-enable sqlsrv pdo_sqlsrv mongodb
 
-# copy certificate
-COPY cfg/cacert-2024-07-02.pem /user/local/lib/cacert-2024-07-02.pem
+# download cert
+RUN curl --remote-name --time-cond cacert.pem https://curl.se/ca/cacert.pem
+RUN mv /root/cacert.pem /usr/local/lib/cacert.pem
 
 # copy custom php.ini
-COPY cfg/php.ini /user/local/etc/php/php.ini
+COPY cfg/php.ini /usr/local/etc/php/php.ini
 
 # setting up projects folder and testing php.ini
 RUN mkdir /var/www/html/app

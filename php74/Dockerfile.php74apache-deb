@@ -59,6 +59,13 @@ RUN docker-php-source extract \
     && docker-php-ext-install pdo pdo_mysql mysqli mbstring xml zip intl soap bcmath \
     && docker-php-source delete
 
+# download cert
+RUN curl --remote-name --time-cond cacert.pem https://curl.se/ca/cacert.pem
+RUN mv /root/cacert.pem /usr/local/lib/cacert.pem
+
+# copy custom php.ini
+COPY cfg/php.ini /usr/local/etc/php/php.ini 
+
 # setting up projects
 RUN mkdir /var/www/html/app
 WORKDIR /var/www/html/app
