@@ -1,0 +1,117 @@
+FROM php:8.1-apache
+
+# set default timezone
+ENV TZ=Asia/Jakarta
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone 
+RUN date
+
+# set bash shell
+SHELL ["/bin/bash", "-c"] 
+
+# setup environment
+ENV ACCEPT_EULA=Y
+
+# Setel variabel lingkungan untuk menghindari interaksi selama installasi
+ENV DEBIAN_FRONTEND=noninteractive
+
+# install application dependency
+#RUN apt-get update  && \
+#    apt-get install wget && \
+#    apt-get install curl -y && \
+#    apt-get install zip -y && \
+#    apt-get install libxml2-dev -y 
+
+RUN apt-get remove openssl -y
+
+RUN apt-get update && \
+    apt-get install -y \
+    build-essential \
+    wget \
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    libssl-dev \
+    zlib1g-dev \
+    libonig-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libfreetype6-dev \
+    libicu-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# download and extract OpenSSL 1.1.1n
+RUN wget https://www.openssl.org/source/openssl-1.1.1n.tar.gz && \
+    tar -xzf openssl-1.1.1n.tar.gz && \
+    cd openssl-1.1.1n && \
+    ./config --prefix=/usr/local/openssl-1.1.1n && \
+    make && \
+    make install && \
+    ldconfig
+
+# Atur path untuk menggunakan OpenSSL 
+ENV PATH="/usr/local/openssl-1.1.1n/bin:${PATH}"
+ENV LD_LIBRARY_PATH="/usr/local/openssl-1.1.1n/lib:${LD_LIBRARY_PATH}"
+
+#RUN docker-php-ext-install openssl
+
+# install odbc dev library
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc
+RUN curl https://packages.microsoft.com/config/debian/11/prod.list | tee /etc/apt/sources.list.d/mssql-release.list
+RUN apt-get update
+RUN apt-get install msodbcsql18 -y
+RUN apt-get install mssql-tools18 -y
+RUN echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
+RUN source ~/.bashrc
+RUN apt-get install unixodbc-dev libgssapi-krb5-2 -y
+
+#install composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN chmod +x /usr/bin/composer
+
+# install PHP extension 
+RUN apt-get install -y \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libpng-dev \
+        libonig-dev \
+        libzip-dev \
+    && docker-php-ext-install -j$(nproc) iconv \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd
+
+RUN docker-php-source extract \
+    && docker-php-ext-install pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath \
+    && docker-php-source delete
+
+# install sqlserver + mongodb via pecl and enable extension
+RUN pecl install sqlsrv pdo_sqlsrv mongodb
+RUN docker-php-ext-enable sqlsrv pdo_sqlsrv mongodb
+
+# download cert
+WORKDIR /usr/local/lib
+RUN curl --etag-compare etag.txt --etag-save etag.txt --remote-name https://curl.se/ca/cacert.pem
+
+# copy custom php.ini
+COPY cfg/php.ini /usr/local/etc/php/php.ini
+
+# setting up projects folder and testing php.ini
+RUN mkdir /var/www/html/app
+WORKDIR /var/www/html/app
+RUN mkdir public
+RUN echo '<?php phpinfo(); ?>' >> /var/www/html/app/public/index.php
+
+# copy default configuration of apache
+COPY cfg/default.conf /etc/apache2/sites-available/000-default.conf
+# enable apache rewrite mode
+RUN a2enmod rewrite && a2enmod headers
+
+# remove bash
+# RUN apt-get autoremove --purge bash -y --allow-remove-essential
+
+# clean up junk
+RUN apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+
+# expose port
+EXPOSE 80
+
+# start supervisor
+CMD /usr/sbin/apache2ctl -D FOREGROUND
