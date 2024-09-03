@@ -1,4 +1,4 @@
-FROM php:8.3-apache
+FROM php:apache-bullseye
 
 # set default timezone
 ENV TZ=Asia/Jakarta
@@ -15,43 +15,43 @@ ENV ACCEPT_EULA=Y
 ENV DEBIAN_FRONTEND=noninteractive
 
 # install application dependency
-#RUN apt-get update  && \
-#    apt-get install wget && \
-#    apt-get install curl -y && \
-#    apt-get install zip -y && \
-#    apt-get install libxml2-dev -y 
+RUN apt-get update  && \
+    apt-get install wget && \
+    apt-get install curl -y && \
+    apt-get install zip -y && \
+    apt-get install libxml2-dev -y 
 
-RUN apt-get remove openssl -y
+#RUN apt-get remove openssl -y
 
-RUN apt-get update && \
-    apt-get install -y \
-    build-essential \
-    wget \
-    libcurl4-openssl-dev \
-    libxml2-dev \
-    libssl-dev \
-    zlib1g-dev \
-    libonig-dev \
-    libjpeg-dev \
-    libpng-dev \
-    libfreetype6-dev \
-    libicu-dev \
-    && rm -rf /var/lib/apt/lists/*
+#RUN apt-get update && \
+#    apt-get install -y \
+#    build-essential \
+#    wget \
+#    libcurl4-openssl-dev \
+#    libxml2-dev \
+#    libssl-dev \
+#    zlib1g-dev \
+#    libonig-dev \
+#    libjpeg-dev \
+#    libpng-dev \
+#    libfreetype6-dev \
+#    libicu-dev \
+#    && rm -rf /var/lib/apt/lists/*
 
 # download and extract OpenSSL 1.1.1n
-RUN wget https://www.openssl.org/source/openssl-1.1.1n.tar.gz && \
-    tar -xzf openssl-1.1.1n.tar.gz && \
-    cd openssl-1.1.1n && \
-    ./config --prefix=/usr/local/openssl-1.1.1n && \
-    make && \
-    make install && \
-    ldconfig
+#RUN wget https://www.openssl.org/source/openssl-1.1.1n.tar.gz && \
+#    tar -xzf openssl-1.1.1n.tar.gz && \
+#    cd openssl-1.1.1n && \
+#    ./config --prefix=/usr/local/openssl-1.1.1n && \
+#    make && \
+#    make install && \
+#    ldconfig
 
 # Atur path untuk menggunakan OpenSSL 
-ENV PATH="/usr/local/openssl-1.1.1n/bin:${PATH}"
-ENV LD_LIBRARY_PATH="/usr/local/openssl-1.1.1n/lib:${LD_LIBRARY_PATH}"
+#ENV PATH="/usr/local/openssl-1.1.1n/bin:${PATH}"
+#ENV LD_LIBRARY_PATH="/usr/local/openssl-1.1.1n/lib:${LD_LIBRARY_PATH}"
 
-RUN docker-php-ext-install openssl
+#RUN docker-php-ext-install openssl
 
 # install odbc dev library
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc
