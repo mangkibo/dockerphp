@@ -73,8 +73,7 @@ RUN echo extension=pdo_sqlsrv.so >> `php --ini | grep "Scan for additional .ini 
 RUN echo extension=sqlsrv.so >> `php --ini | grep "Scan for additional .ini files" | sed -e "s|.*:\s*||"`/00_sqlsrv.ini
 
 # download cert
-RUN curl --remote-name --time-cond cacert.pem https://curl.se/ca/cacert.pem
-RUN mv cacert.pem /usr/local/lib/cacert.pem
+RUN curl -o /usr/local/lib/cacert.pem --remote-name --time-cond cacert.pem https://curl.se/ca/cacert.pem
 
 # copy custom php.inij
 COPY cfg/php.ini /usr/local/etc/php/php.ini 
