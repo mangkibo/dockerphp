@@ -52,7 +52,7 @@ RUN docker-php-ext-enable sqlsrv pdo_sqlsrv mongodb
 
 # download cert
 RUN curl --remote-name --time-cond cacert.pem https://curl.se/ca/cacert.pem
-RUN mv /root/cacert.pem /usr/local/lib/cacert.pem
+RUN mv cacert.pem /usr/local/lib/cacert.pem
 
 # copy custom php.ini
 COPY cfg/php.ini /usr/local/etc/php/php.ini

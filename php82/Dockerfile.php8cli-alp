@@ -38,11 +38,12 @@ RUN pecl install sqlsrv pdo_sqlsrv mongodb
 RUN docker-php-ext-enable sqlsrv pdo_sqlsrv mongodb
 
 
-# copy certificate
-COPY cfg/cacert-2024-07-02.pem /user/local/lib/cacert-2024-07-02.pem
+# download cert
+RUN curl --remote-name --time-cond cacert.pem https://curl.se/ca/cacert.pem
+RUN mv cacert.pem /usr/local/lib/cacert.pem
 
 # copy custom php.ini
-COPY cfg/php.ini /usr/local/etc/php/php.ini 
+COPY cfg/php.ini /usr/local/etc/php/php.ini
 
 #COMPOSER
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

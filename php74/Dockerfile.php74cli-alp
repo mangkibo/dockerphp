@@ -74,9 +74,9 @@ RUN echo extension=sqlsrv.so >> `php --ini | grep "Scan for additional .ini file
 
 # download cert
 RUN curl --remote-name --time-cond cacert.pem https://curl.se/ca/cacert.pem
-RUN mv /root/cacert.pem /usr/local/lib/cacert.pem
+RUN mv cacert.pem /usr/local/lib/cacert.pem
 
-# copy custom php.ini
+# copy custom php.inij
 COPY cfg/php.ini /usr/local/etc/php/php.ini 
 
 #COMPOSER
