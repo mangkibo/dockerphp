@@ -32,8 +32,8 @@ RUN curl https://packages.microsoft.com/config/debian/11/prod.list | tee /etc/ap
 RUN apt-get update
 RUN apt-get install msodbcsql18 -y
 RUN apt-get install mssql-tools18 -y
-RUN echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ./.bashrc
-RUN source ./.bashrc
+RUN echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> .bashrc
+RUN source .bashrc
 RUN apt-get install unixodbc-dev libgssapi-krb5-2 -y
 
 
