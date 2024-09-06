@@ -9,6 +9,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Set the working directory to /var/www/html
 WORKDIR /var/www/html
+RUN mkdir public
+RUN echo '<?php phpinfo(); ?>' >> /var/www/html/public/index.php
 
 # Copy the Laravel app files to the container
 # COPY . .
