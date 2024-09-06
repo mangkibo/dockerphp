@@ -24,15 +24,18 @@ USER root
 #    && pecl install pdo_sqlsrv \
 #    && docker-php-ext-enable sqlsrv pdo_sqlsrv
 
-RUN apt-get update && apt-get install -y gnupg2
+# setup environment
+ENV ACCEPT_EULA=Y
+
+# install odbc dev library
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc
 RUN curl https://packages.microsoft.com/config/debian/11/prod.list | tee /etc/apt/sources.list.d/mssql-release.list
 RUN apt-get update
-RUN apt-get ACCEPT_EULA=Y apt-get -y --no-install-recommends install msodbcsql18 mssql-tools18  unixodbc-dev libgssapi-krb5-2 -y
+RUN apt-get install msodbcsql18 -y
+RUN apt-get install mssql-tools18 -y
 RUN echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
 RUN source ~/.bashrc
-RUN pecl install sqlsrv
-RUN pecl install pdo_sqlsrv
+RUN apt-get install unixodbc-dev libgssapi-krb5-2 -y
 RUN docker-php-ext-enable sqlsrv pdo_sqlsrv
 
 RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath
