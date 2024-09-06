@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     container_name: php74_cntr
     image: php74_img
-    platforms: "linux/amd64"
+    platform: "linux/amd64"
     ports: 
       - 8121:8080
     networks:
@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile
     container_name: php82_cntr
     image: php83_img
-    platforms: "linux/amd64"
+    platform: "linux/amd64"
     ports: 
       - 8123:8080
     networks:
