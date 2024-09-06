@@ -7,7 +7,6 @@ services:
     container_name: php74_cntr
     platforms:
       - "linux/amd64"
-      - "linux/arm64"
     image: php74_img
     ports: 
       - 8121:8080
@@ -20,7 +19,6 @@ services:
     container_name: php82_cntr
     platforms:
       - "linux/amd64"
-      - "linux/arm64"
     image: php83_img
     ports: 
       - 8123:8080
