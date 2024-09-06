@@ -14,15 +14,24 @@ WORKDIR /var/www/html
 # in order to change ownership we need change user to root
 USER root
 
-# install some dependencies
-RUN apt-get update && apt-get install -y gnupg2 \
+# install SQL Server Driver
+RUN apt-get update \
+    && apt-get install -y gnupg2 \
     && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
-    && apt-get update \
-    && ACCEPT_EULA=Y apt-get -y --no-install-recommends install msodbcsql17 unixodbc-dev \
-    && pecl install sqlsrv \
-    && pecl install pdo_sqlsrv \
-    && docker-php-ext-enable sqlsrv pdo_sqlsrv
+    && curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get install -y --no-install-recommends \
+      locales \
+        apt-transport-https \
+    && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
+    && locale-gen
+
+RUN apt-get update \
+    && apt-get -y --no-install-recommends install \
+        unixodbc unixodbc-dev \
+        msodbcsql17
+
+RUN pecl install sqlsrv pdo_sqlsrv
+RUN docker-php-ext-enable sqlsrv pdo_sqlsrv
 
 RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath
 
