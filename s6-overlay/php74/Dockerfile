@@ -26,8 +26,7 @@ RUN apt-get update && apt-get install -y gnupg2 \
 
 RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath
 
-#COPY ODBC INI
-# COPY cfg/odbcinst.ini /etc/odbcinst.ini
+# custom setup for ODBC on /etc/odbcinst.ini
 RUN sed -i '1 i\[ODBC]\nPooling=Yes\n' /etc/odbcinst.ini 
 RUN sed -i '7 i\CPTimeout=120' /etc/odbcinst.ini 
 
@@ -37,7 +36,7 @@ RUN chown -R www-data:www-data /var/www/html/
 USER www-data
 
 # Install PHP dependencies
-RUN composer install 
+# RUN composer install 
 
 # Expose port 8080 for the Nginx server
 EXPOSE 8080
