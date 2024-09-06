@@ -19,25 +19,37 @@ USER root
 #    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
 #    && curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
 #    && apt-get update \
-#    && ACCEPT_EULA=Y apt-get -y --no-install-recommends install msodbcsql17 unixodbc-dev \
-#    && pecl install sqlsrv \
-#    && pecl install pdo_sqlsrv \
-#    && docker-php-ext-enable sqlsrv pdo_sqlsrv
+#    && ACCEPT_EULA=Y apt-get -y --no-install-recommends install msodbcsql17 unixodbc-dev
 
 # setup environment
 ENV ACCEPT_EULA=Y
 
+RUN apt-get install curl apt-transport-https
+
 # install odbc dev library
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc
-RUN curl https://packages.microsoft.com/config/debian/11/prod.list | tee /etc/apt/sources.list.d/mssql-release.list
+#RUN curl https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc
+#RUN curl https://packages.microsoft.com/config/debian/11/prod.list | tee /etc/apt/sources.list.d/mssql-release.list
+#RUN apt-get update
+#RUN apt-get install msodbcsql18 -y
+#RUN apt-get install mssql-tools18 -y
+#RUN echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
+#RUN source ~/.bashrc
+#RUN apt-get install unixodbc-dev libgssapi-krb5-2 -y
+
+
+RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+RUN curl https://packages.microsoft.com/config/debian/12/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
 RUN apt-get update
-RUN apt-get install msodbcsql18 -y
-RUN apt-get install mssql-tools18 -y
+RUN ACCEPT_EULA=Y apt-get install -y msodbcsql18
+RUN ACCEPT_EULA=Y apt-get install -y mssql-tools18
 RUN echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
 RUN source ~/.bashrc
-RUN apt-get install unixodbc-dev libgssapi-krb5-2 -y
-RUN docker-php-ext-enable sqlsrv pdo_sqlsrv
+RUN apt-get install -y unixodbc-dev
+RUN apt-get install -y libgssapi-krb5-2
 
+RUN pecl install sqlsrv \
+    && pecl install pdo_sqlsrv \
+    && docker-php-ext-enable sqlsrv pdo_sqlsrv
 RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath
 
 # custom setup for ODBC on /etc/odbcinst.ini
