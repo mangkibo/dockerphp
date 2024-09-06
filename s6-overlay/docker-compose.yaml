@@ -1,16 +1,16 @@
 name: dockerphp-test
 services:
-  php74s6:
-    build:
-      context: "./php74"
-      dockerfile: Dockerfile
-    container_name: php74s6_cntr
-    image: php74s6_img
-    platform: "linux/amd64"
-    ports: 
-      - 8121:8080
-    networks:
-      - localnetwork
+  #php74s6:
+  #  build:
+  #    context: "./php74"
+  #    dockerfile: Dockerfile
+  #  container_name: php74s6_cntr
+  #  image: php74s6_img
+  #  platform: "linux/amd64"
+  #  ports: 
+  #    - 8121:8080
+  #  networks:
+  #    - localnetwork
   php83s6:
     build:
       context: "./php83"
