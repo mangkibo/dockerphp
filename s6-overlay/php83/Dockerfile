@@ -11,6 +11,9 @@ WORKDIR /var/www/html
 # Copy the Laravel app files to the container
 # COPY . .
 
+# set bash shell
+SHELL ["/bin/bash", "-c"] 
+
 # in order to change ownership we need change user to root
 USER root
 
@@ -32,8 +35,8 @@ RUN curl https://packages.microsoft.com/config/debian/11/prod.list | tee /etc/ap
 RUN apt-get update
 RUN apt-get install msodbcsql18 -y
 RUN apt-get install mssql-tools18 -y
-RUN echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> .bashrc
-RUN source .bashrc
+RUN echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
+RUN source ~/.bashrc
 RUN apt-get install unixodbc-dev libgssapi-krb5-2 -y
 
 
