@@ -1,0 +1,25 @@
+name: dockerphp-test
+services:
+  #php74ap:
+  #  build:
+  #    context: "./php74"
+  #    dockerfile: Dockerfile
+  #  container_name: php74_cntr
+  #  image: php74_img
+  #  ports: 
+  #    - 8121:8080
+  #  networks:
+  #    - localnetwork
+  php83ap:
+    build:
+      context: "./php83"
+      dockerfile: Dockerfile
+    container_name: php82_cntr
+    image: php83_img
+    ports: 
+      - 8123:8080
+    networks:
+      - localnetwork
+networks:
+  localnetwork:
+    driver: bridge
