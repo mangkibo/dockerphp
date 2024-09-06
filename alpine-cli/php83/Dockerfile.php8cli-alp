@@ -41,6 +41,10 @@ RUN docker-php-ext-enable sqlsrv pdo_sqlsrv mongodb
 #WORKDIR /usr/local/lib
 #RUN curl --etag-compare etag.txt --etag-save etag.txt --remote-name https://curl.se/ca/cacert.pem
 
+# custom setup for ODBC on /etc/odbcinst.ini
+RUN sed -i '1 i\[ODBC]\nPooling=Yes\n' /etc/odbcinst.ini 
+RUN sed -i '7 i\CPTimeout=120' /etc/odbcinst.ini 
+
 # copy custom php.ini
 COPY cfg/php.ini /usr/local/etc/php/php.ini 
 
