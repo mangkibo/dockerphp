@@ -26,9 +26,6 @@ USER root
 #    && apt-get update \
 #    && ACCEPT_EULA=Y apt-get -y --no-install-recommends install msodbcsql17 unixodbc-dev
 
-# setup environment
-
-
 RUN apt-get install curl apt-transport-https
 
 # install odbc dev library
@@ -60,3 +57,6 @@ USER www-data
 
 # Expose port 8080 for the Nginx server
 EXPOSE 8080
+
+# start service
+ENTRYPOINT ["/init"]
