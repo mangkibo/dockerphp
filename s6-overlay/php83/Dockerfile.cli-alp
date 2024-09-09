@@ -1,0 +1,42 @@
+FROM serversideup/php:8.3-cli-alpine
+
+USER root
+
+RUN apk update && apk add --no-cache autoconf zip \
+    libzip-dev libxml2-dev icu-dev curl oniguruma-dev \
+    $PHPIZE_DEPS openssl-dev
+
+# install odbc library
+COPY alp-odbc.sh ./odbc.sh
+RUN sh odbc.sh
+
+# install sqlserver and mongodb
+RUN apk add unixodbc-dev 
+RUN pecl install sqlsrv
+RUN pecl install pdo_sqlsrv
+RUN docker-php-ext-enable sqlsrv pdo_sqlsrv
+
+# install php library
+RUN apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev && \
+  docker-php-ext-configure gd \
+    --with-freetype=/usr/include/ \
+    --with-jpeg=/usr/include/ && \
+  NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
+  docker-php-ext-install -j${NPROC} gd && \
+  apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
+
+RUN docker-php-source extract \
+    && docker-php-ext-install pdo pdo_mysql mysqli mbstring xml zip intl soap bcmath exif \
+    && docker-php-source delete
+
+# custom setup for ODBC on /etc/odbcinst.ini
+RUN sed -i '1 i\[ODBC]\nPooling=Yes\n' /etc/odbcinst.ini 
+RUN sed -i '7 i\CPTimeout=120' /etc/odbcinst.ini 
+
+# set workdir
+RUN mkdir /app
+RUN chown -R www-data:www-data /app
+WORKDIR /app
+
+# bring back to non-root user
+USER www-data
