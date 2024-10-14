@@ -16,6 +16,9 @@ RUN echo '<?php phpinfo(); ?>' >> /var/www/html/public/index.php
 # in order to change ownership we need change user to root
 USER root
 
+# install utilites
+RUN apt-get update && apt install vim telnet iputils-ping -y
+
 # install some dependencies
 RUN apt-get update && apt-get install -y gnupg2 \
     && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
