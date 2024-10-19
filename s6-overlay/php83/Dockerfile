@@ -17,9 +17,8 @@ RUN echo '<?php phpinfo(); ?>' >> /var/www/html/public/index.php
 USER root
 
 # install utilites
-RUN apt-get update && apt install vim nano telnet iputils-ping traceroute -y
-RUN apt-get procps top -y
-
+RUN apt-get update && apt install vim nano \
+    procps telnet iputils-ping traceroute -y
 
 # install some dependencies
 RUN apt-get update && apt-get install -y gnupg2 \
