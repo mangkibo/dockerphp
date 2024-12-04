@@ -26,7 +26,7 @@ RUN apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev lib
   apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
 
 RUN docker-php-source extract \
-    && docker-php-ext-install pdo pdo_mysql mysqli mbstring xml zip intl soap bcmath exif \
+    && docker-php-ext-install pdo pdo_mysql mysqli mbstring xml zip intl soap bcmath exif mongodb \
     && docker-php-source delete
 
 # custom setup for ODBC on /etc/odbcinst.ini

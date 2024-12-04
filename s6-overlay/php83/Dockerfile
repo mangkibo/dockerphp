@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install -y gnupg2 \
     && pecl install pdo_sqlsrv \
     && docker-php-ext-enable sqlsrv pdo_sqlsrv  
     
-RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath
+RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath mongodb
 
 # custom setup for ODBC on /etc/odbcinst.ini
 RUN sed -i '1 i\[ODBC]\nPooling=Yes\n' /etc/odbcinst.ini 
