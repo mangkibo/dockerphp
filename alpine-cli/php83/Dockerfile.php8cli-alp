@@ -1,5 +1,7 @@
 FROM php:8.3-cli-alpine
 
+ENV TZ=Asia/Jakarta
+
 # install devel library
 RUN apk update && apk add --no-cache sudo zip libzip-dev libxml2-dev icu-dev curl \
     $PHPIZE_DEPS openssl-dev

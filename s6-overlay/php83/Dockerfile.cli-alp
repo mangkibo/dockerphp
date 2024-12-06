@@ -1,5 +1,7 @@
 FROM serversideup/php:8.3-cli-alpine
 
+ENV TZ=Asia/Jakarta
+
 USER root
 
 RUN apk update && apk add --no-cache autoconf zip \
