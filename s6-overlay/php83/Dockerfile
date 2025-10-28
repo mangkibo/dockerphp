@@ -21,6 +21,9 @@ USER root
 RUN apt-get update && apt install vim nano \
     procps telnet iputils-ping traceroute -y
 
+# install gg devlibraries
+RUN apt-get install -y libpq-dev
+
 # install some dependencies
 RUN apt-get update && apt-get install -y gnupg2 \
     && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
@@ -31,7 +34,7 @@ RUN apt-get update && apt-get install -y gnupg2 \
     && pecl install pdo_sqlsrv \
     && docker-php-ext-enable sqlsrv pdo_sqlsrv  
     
-RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath mongodb
+RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath mongodb pdo_pgsql pgsql
 
 # custom setup for ODBC on /etc/odbcinst.ini
 RUN sed -i '1 i\[ODBC]\nPooling=Yes\n' /etc/odbcinst.ini 

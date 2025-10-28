@@ -33,6 +33,7 @@ RUN apt-get update && apt install vim nano \
 #     && pecl install pdo_sqlsrv \
 #     && docker-php-ext-enable sqlsrv pdo_sqlsrv  
 
+RUN apt-get install -y libpq-dev
 
 RUN curl -sSL -O https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb
 # Install the package
@@ -53,8 +54,7 @@ RUN pecl install sqlsrv \
     && pecl install pdo_sqlsrv \
     && docker-php-ext-enable sqlsrv pdo_sqlsrv 
 
-    
-RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath
+RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath pdo_pgsql pgsql
 
 # custom setup for ODBC on /etc/odbcinst.ini
 RUN sed -i '1 i\[ODBC]\nPooling=Yes\n' /etc/odbcinst.ini 
