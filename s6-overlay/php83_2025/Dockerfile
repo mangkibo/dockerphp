@@ -35,6 +35,11 @@ RUN apt-get update && apt install vim nano \
 
 RUN apt-get install -y libpq-dev
 
+RUN apt-get install -y \
+    git \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN curl -sSL -O https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb
 # Install the package
 RUN dpkg -i packages-microsoft-prod.deb
