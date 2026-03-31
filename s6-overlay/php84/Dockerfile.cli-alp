@@ -6,7 +6,7 @@ USER root
 
 RUN apk update && apk add --no-cache autoconf zip \
     libzip-dev libxml2-dev icu-dev curl oniguruma-dev \
-    $PHPIZE_DEPS openssl-dev
+    $PHPIZE_DEPS openssl-dev postgresql-client postgresql-dev
 
 # install odbc library
 COPY alp-odbc.sh ./odbc.sh
@@ -17,7 +17,7 @@ RUN apk add unixodbc-dev
 RUN pecl install sqlsrv
 RUN pecl install pdo_sqlsrv
 RUN pecl install imagick
-RUN docker-php-ext-enable sqlsrv pdo_sqlsrv imagick
+RUN docker-php-ext-enable sqlsrv pdo_sqlsrv imagick 
 
 # install php library
 RUN apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev && \
@@ -29,7 +29,7 @@ RUN apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev lib
   apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
 
 RUN docker-php-source extract \
-    && docker-php-ext-install pdo pdo_mysql mysqli mbstring xml zip intl soap bcmath exif mongodb \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mysqli mbstring xml zip intl soap bcmath exif mongodb \
     && docker-php-source delete
 
 # custom setup for ODBC on /etc/odbcinst.ini
