@@ -4,7 +4,7 @@ ENV TZ=Asia/Jakarta
 
 # install devel library
 RUN apk update && apk add --no-cache sudo zip libzip-dev libxml2-dev icu-dev curl \
-    $PHPIZE_DEPS openssl-dev postgresql-dev
+    $PHPIZE_DEPS openssl-dev postgresql-client postgresql-dev
 
 #RUN apk update && apk add --no-cache \
 #  bash \
