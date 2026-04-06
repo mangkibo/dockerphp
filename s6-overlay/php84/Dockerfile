@@ -4,6 +4,7 @@ FROM serversideup/php:8.4-fpm-nginx
 # Set environment variable
 ENV SSL_MODE=off  
 ENV TZ=Asia/Jakarta
+ENV SESSION_SECURE_COOKIE=true
 
 # WORKDIR setup
 WORKDIR /var/www/html
