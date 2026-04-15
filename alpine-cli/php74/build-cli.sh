@@ -1,1 +1,1 @@
-docker build -t php:7.4-cli-alpine  -f Dockerfile.php7cli-alp .
+docker build -t php:7.4-cli-alpine  -f Dockerfile.php74cli-alp .
