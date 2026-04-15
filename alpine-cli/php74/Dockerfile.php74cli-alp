@@ -18,7 +18,8 @@ RUN apk update && apk add --no-cache \
   libzip-dev \
   freetype-dev \
   libpng-dev \
-  libjpeg-turbo-dev
+  libjpeg-turbo-dev \
+  postgresql-dev
 
 # Create User Without Root
 RUN addgroup -S mahameru && adduser -S mahameru -G mahameru \
@@ -28,19 +29,16 @@ RUN addgroup -S mahameru && adduser -S mahameru -G mahameru \
 # Install PHP extensions
 RUN docker-php-ext-install zip exif pgsql
 
+# Install PHP extensions and clean up dev dependencies
 RUN docker-php-ext-configure gd \
     --with-freetype=/usr/include/ \
     --with-jpeg=/usr/include/ && \
   NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
-  docker-php-ext-install -j${NPROC} gd
+  docker-php-ext-install -j${NPROC} gd && \
+  apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev libzip-dev postgresql-dev && \
+  apk add --no-cache freetype libpng libjpeg-turbo libzip postgresql-libs   
 
-# Clean up build dependencies
-RUN apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev libzip-dev
-
-# Add runtime libraries needed for extensions
-RUN apk add --no-cache freetype libpng libjpeg-turbo libzip   
-
-# Install MS ODBC Connector
+# Install MS ODBC Connector (for sqlcmd and odbc support)
 RUN curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.8.1.1-1_amd64.apk && \
   curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.8.1.1-1_amd64.apk && \
   curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.8.1.1-1_amd64.sig && \
@@ -56,10 +54,7 @@ RUN apk add --allow-untrusted msodbcsql17_17.8.1.1-1_amd64.apk && \
   apk add --allow-untrusted mssql-tools_17.8.1.1-1_amd64.apk && \
   rm -f *.apk *.sig
 
-# Install PHP SQL Server extensions via PECL
-RUN pecl install sqlsrv pdo_sqlsrv && \
-  echo extension=pdo_sqlsrv.so >> `php --ini | grep "Scan for additional .ini files" | sed -e "s|.*:\s*||"`/10_pdo_sqlsrv.ini && \
-  echo extension=sqlsrv.so >> `php --ini | grep "Scan for additional .ini files" | sed -e "s|.*:\s*||"`/00_sqlsrv.ini
+# Note: sqlsrv and pdo_sqlsrv PHP extensions are not available for PHP 7.4.9 (requires PHP >= 8.3.0)
 
 # Configure ODBC
 RUN sed -i '1 i\[ODBC]\nPooling=Yes\n' /etc/odbcinst.ini && \
