@@ -1,1 +1,1 @@
-docker build -t php7.4cli-base:latest -f Dockerfile.php7cli-alp .
+docker build -t php7.4cli-base:2026 -f Dockerfile.php7cli-alp .
