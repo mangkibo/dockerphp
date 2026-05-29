@@ -1,0 +1,41 @@
+FROM php:7.4.9-cli-alpine3.12
+
+# 1. Grab the extension installer script (The Magic Bullet)
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+# 2. Install base system tools
+RUN apk update && apk add --no-cache \
+    bash \
+    sudo \
+    shadow \
+    curl
+
+# 3. Create User Without Root
+RUN addgroup -S mahameru && adduser -S mahameru -G mahameru \
+    && echo "mahameru ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/mahameru \
+    && chmod 0440 /etc/sudoers.d/mahameru
+
+# 4. Install PHP Extensions and MS ODBC Connector
+# The script handles fetching the correct MS ODBC Alpine packages, accepting the EULA, 
+# compiling GD properly, and matching sqlsrv/pdo_sqlsrv to PHP 7.4
+RUN install-php-extensions \
+    zip \
+    exif \
+    pgsql \
+    pdo_pgsql \
+    gd \
+    sqlsrv \
+    pdo_sqlsrv
+
+# 5. Configure ODBC
+RUN sed -i '1 i\[ODBC]\nPooling=Yes\n' /etc/odbcinst.ini && \
+    sed -i '7 i\CPTimeout=120' /etc/odbcinst.ini
+
+# 6. Copy custom PHP configuration
+COPY cfg/php.ini /usr/local/etc/php/php.ini
+
+# 7. Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# 8. Select User
+USER mahameru
