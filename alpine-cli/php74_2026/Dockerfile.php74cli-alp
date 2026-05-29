@@ -1,4 +1,4 @@
-FROM php:7.4.9-cli-alpine3.12
+FROM php:7.4-cli-alpine
 
 # 1. Grab the extension installer script (The Magic Bullet)
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
@@ -9,11 +9,12 @@ RUN apk update && apk add --no-cache \
     sudo \
     shadow \
     curl \
-    ca-certificates\
+    ca-certificates \
     libstdc++ \
     libc6-compat \
     gcompat \
-    unixodbc
+    unixodbc \
+    && update-ca-certificates
 
 # 3. Create User Without Root
 RUN addgroup -S mahameru && adduser -S mahameru -G mahameru \
