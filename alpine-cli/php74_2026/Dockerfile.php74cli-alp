@@ -9,7 +9,11 @@ RUN apk update && apk add --no-cache \
     sudo \
     shadow \
     curl \
-    ca-certificates
+    ca-certificates\
+    libstdc++ \
+    libc6-compat \
+    gcompat \
+    unixodbc
 
 # 3. Create User Without Root
 RUN addgroup -S mahameru && adduser -S mahameru -G mahameru \
