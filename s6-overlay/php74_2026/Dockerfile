@@ -29,7 +29,7 @@ RUN apt-get update \
     && locale-gen
 
 RUN apt-get update \
-    && apt-get -y --no-install-recommends install \
+    && ACCEPT_EULA=Y apt-get -y --no-install-recommends install \
         unixodbc unixodbc-dev \
         msodbcsql17
 
