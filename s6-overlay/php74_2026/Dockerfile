@@ -3,8 +3,7 @@ FROM serversideup/php:7.4-fpm-nginx
 
 # Set environment variable to customize base image
 # see more https://serversideup.net/open-source/docker-php/docs/reference/environment-variable-specification
-ENV SSL_MODE off  
-
+ENV SSL_MODE=off  
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Set the working directory to /var/www/html
