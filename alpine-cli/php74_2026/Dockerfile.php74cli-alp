@@ -8,7 +8,8 @@ RUN apk update && apk add --no-cache \
     bash \
     sudo \
     shadow \
-    curl
+    curl \
+    ca-certificates
 
 # 3. Create User Without Root
 RUN addgroup -S mahameru && adduser -S mahameru -G mahameru \
