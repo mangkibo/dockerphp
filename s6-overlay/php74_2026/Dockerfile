@@ -33,10 +33,11 @@ RUN apt-get update \
         unixodbc unixodbc-dev \
         msodbcsql17
 
-RUN pecl install sqlsrv pdo_sqlsrv
-RUN docker-php-ext-enable sqlsrv pdo_sqlsrv
+## RUN pecl install sqlsrv pdo_sqlsrv
+## RUN docker-php-ext-enable sqlsrv pdo_sqlsrv
 
-RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath pgsql pdo_pgsql
+RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring xml zip intl soap bcmath sqlsrv pdo_sqlsrv pgsql pdo_pgsql
+RUN docker-php-ext-enable sqlsrv pdo_sqlsrv
 
 # custom setup for ODBC on /etc/odbcinst.ini
 RUN sed -i '1 i\[ODBC]\nPooling=Yes\n' /etc/odbcinst.ini 
