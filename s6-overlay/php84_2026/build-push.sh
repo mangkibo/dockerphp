@@ -2,7 +2,7 @@
 set -eu
 
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-image="kiboaleph/php:8.4-serversideup"
+image="kiboaleph/php:8.4-serversideup-2026"
 
 docker buildx build \
   --builder dockerphp-builder \
