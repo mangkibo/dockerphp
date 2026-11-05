@@ -2,7 +2,7 @@
 set -eu
 
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-image="kiboaleph/php:8.4-serversideup-2026"
+image="kiboaleph/php:8.4-serversideup-2026.11"
 
 docker buildx build \
   --builder dockerphp-builder \
@@ -16,4 +16,4 @@ docker buildx build \
 docker run --rm --pull=never --platform linux/amd64 --entrypoint php "$image" \
   -r 'echo PHP_VERSION, PHP_EOL; exit(PHP_VERSION_ID >= 80427 && PHP_VERSION_ID < 80500 ? 0 : 1);'
 
-docker push "$image"
+# docker push "$image"

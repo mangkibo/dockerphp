@@ -6,6 +6,7 @@ FROM serversideup/php:8.3-fpm-nginx
 ENV SSL_MODE=off  
 ENV TZ=Asia/Jakarta
 ENV ACCEPT_EULA=Y
+ENV NGINX_SERVER_TOKENS=off
 
 
 # Set the working directory to /var/www/html
@@ -76,6 +77,49 @@ RUN install-php-extensions openssl mcrypt gd pdo pdo_mysql mysqli iconv mbstring
 # custom setup for ODBC on /etc/odbcinst.ini
 RUN sed -i '1 i\[ODBC]\nPooling=Yes\n' /etc/odbcinst.ini 
 RUN sed -i '7 i\CPTimeout=120' /etc/odbcinst.ini 
+
+# Hardening Nginx:
+# 1. Build modul dynamic headers-more sesuai versi Nginx di container untuk menghapus header "Server: nginx"
+# 2. Daftarkan load_module pada /etc/nginx/nginx.conf.template
+# 3. Tolak pola injeksi XML/XXE pada URL dan gunakan custom response 400 & 404 tanpa identitas server
+ARG HEADERS_MORE_VERSION=0.37
+RUN set -eux; \
+    apt-get update && apt-get install -y --no-install-recommends \
+        build-essential libpcre2-dev zlib1g-dev; \
+    NGINX_VERSION="$(nginx -v 2>&1 | sed 's/^.*nginx\///;s/ .*$//')"; \
+    mkdir -p /tmp/nginx-headers-more /etc/nginx/modules; \
+    curl -fsSL "https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz" -o /tmp/nginx-headers-more/nginx.tar.gz; \
+    curl -fsSL "https://github.com/openresty/headers-more-nginx-module/archive/refs/tags/v${HEADERS_MORE_VERSION}.tar.gz" -o /tmp/nginx-headers-more/headers-more.tar.gz; \
+    tar -xzf /tmp/nginx-headers-more/nginx.tar.gz -C /tmp/nginx-headers-more; \
+    tar -xzf /tmp/nginx-headers-more/headers-more.tar.gz -C /tmp/nginx-headers-more; \
+    cd "/tmp/nginx-headers-more/nginx-${NGINX_VERSION}"; \
+    ./configure --with-compat --add-dynamic-module="/tmp/nginx-headers-more/headers-more-nginx-module-${HEADERS_MORE_VERSION}"; \
+    make modules; \
+    cp objs/ngx_http_headers_more_filter_module.so /etc/nginx/modules/; \
+    sed -i '1i load_module /etc/nginx/modules/ngx_http_headers_more_filter_module.so;' /etc/nginx/nginx.conf.template; \
+    rm -rf /tmp/nginx-headers-more; \
+    apt-get purge -y --auto-remove build-essential libpcre2-dev zlib1g-dev; \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /etc/nginx/server-opts.d && \
+    printf '%s\n' \
+    'server_tokens off;' \
+    'more_clear_headers Server;' \
+    'more_clear_headers X-Powered-By;' \
+    'if ($request_uri ~* "(<!ENTITY|<!DOCTYPE|xmlns:|%3C%3Fxml|%3C!DOCTYPE|%3C!ENTITY)") {' \
+    '    return 400 "400 Bad Request\n";' \
+    '}' \
+    'error_page 400 @custom_400;' \
+    'location @custom_400 {' \
+    '    default_type text/plain;' \
+    '    return 400 "400 Bad Request\n";' \
+    '}' \
+    'error_page 404 @custom_404;' \
+    'location @custom_404 {' \
+    '    default_type text/plain;' \
+    '    return 404 "404 Not Found\n";' \
+    '}' \
+    > /etc/nginx/server-opts.d/99-xml-hardening.conf
 
 # change project directory owner to www-data
 RUN chown -R www-data:www-data /var/www/html/
